@@ -31,7 +31,8 @@ on:
         description: '编译器下载地址'
         required: false
         type: string
-        default: 'https://github.com/XSans0/WeebX-Clang/releases/download/WeebX-Clang-19.1.5-release/WeebX-Clang-19.1.5.tar.gz'
+        # default: 'https://github.com/XSans0/WeebX-Clang/releases/download/WeebX-Clang-19.1.5-release/WeebX-Clang-19.1.5.tar.gz'
+        default: 'https://github.com/Neutron-Toolchains/clang-build-catalogue/releases/download/10032024/neutron-clang-10032024.tar.zst'
 
 jobs:
 
@@ -70,10 +71,12 @@ jobs:
 
       - name: Install Clang
         run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y zstd
           mkdir clang
           wget ${{ inputs.clang_url }}
-          tar -C clang/ -zxvf *.tar.gz
-      
+          tar -I zstd -xf *.tar.zst -C clang/ --strip-components=1
+
       - name: Clone Kernel
         run: |
           git clone --depth=1 -b ${{ inputs.kernel_tag }} ${{ inputs.git_url }} kernel-source
@@ -98,8 +101,8 @@ jobs:
           export PATH=${ClangHome}/bin:${PATH}
           cd kernel-source
           make LLVM=1 LLVM_IAS=1 O=out ARCH=arm64 SUBARCH=arm64 CC=clang LD=ld.lld ${{ inputs.config_name }}
-          make -j$(nproc) LLVM=1 LLVM_IAS=1 O=out ARCH=arm64 SUBARCH=arm64 CC=clang LD=ld.lld CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- KBUILD_BUILD_USER=Asultop_ZRYX KBUILD_BUILD_HOST=localhost 
-
+          make -j$(nproc) LLVM=1 LLVM_IAS=1 O=out ARCH=arm64 SUBARCH=arm64 CC=clang LD=ld.lld CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- KBUILD_BUILD_USER=hylab KBUILD_BUILD_HOST=localhost
+      
       - name: Patch Boot
         run: |
           chmod +x ./magiskboot
