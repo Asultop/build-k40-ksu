@@ -11,22 +11,22 @@ on:
         description: '内核配置文件路径（如果不需要KSU则忽略）/一般默认即可'
         required: false
         type: string
-        default: 'arch/arm64/configs/'
+        default: 'arch/arm64/configs/vendor/'
       kernel_tag:
         description: '内核代码分支/Tag'
         required: false
         type: string
-        default: 'master'
+        default: 'stable'
       config_name:
         description: '内核编译配置文件名'
         required: false
         type: string
-        default: 'alioth_hylab_defconfig'
+        default: 'alioth_defconfig'
       git_url:
         description: '内核仓库地址'
         required: false
         type: string
-        default: 'https://github.com/zfdx123/kernel_xiaomi_alioth.git'
+        default: 'https://github.com/AsulTop/kernel_sm8250.git'
       clang_url:
         description: '编译器下载地址'
         required: false
@@ -86,8 +86,8 @@ jobs:
           echo "CONFIG_KPROBES=y" >> ${{ inputs.config_path }}${{ inputs.config_name }}
           echo "CONFIG_HAVE_KPROBES=y" >> ${{ inputs.config_path }}${{ inputs.config_name }}
           echo "CONFIG_KPROBE_EVENTS=y" >> ${{ inputs.config_path }}${{ inputs.config_name }}
-          git config --global user.email "robot@example.com"
-          git config --global user.name "robot"
+          git config --global user.email "Alivn@Asul.top"
+          git config --global user.name "AsulRobot"
           git add ${{ inputs.config_path }}${{ inputs.config_name }}
           git commit -m "KUS"
           ./KernelSU/kernel/setup.sh v0.9.5
@@ -98,7 +98,7 @@ jobs:
           export PATH=${ClangHome}/bin:${PATH}
           cd kernel-source
           make LLVM=1 LLVM_IAS=1 O=out ARCH=arm64 SUBARCH=arm64 CC=clang LD=ld.lld ${{ inputs.config_name }}
-          make -j$(nproc) LLVM=1 LLVM_IAS=1 O=out ARCH=arm64 SUBARCH=arm64 CC=clang LD=ld.lld CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- KBUILD_BUILD_USER=hylab KBUILD_BUILD_HOST=localhost
+          make -j$(nproc) LLVM=1 LLVM_IAS=1 O=out ARCH=arm64 SUBARCH=arm64 CC=clang LD=ld.lld CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- KBUILD_BUILD_USER=Asultop KBUILD_BUILD_HOST=localhost HOSTCFLAGS="-mno-regalloc-eviction-advisor"
 
       - name: Patch Boot
         run: |
